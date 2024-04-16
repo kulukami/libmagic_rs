@@ -1,1 +1,1 @@
-
+pub mod magic;
