@@ -1,4 +1,5 @@
 /target
 /build
 /file
+/test
 Cargo.lock
