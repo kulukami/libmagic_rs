@@ -12,7 +12,8 @@ bindgen = { version = "0.69" }
 [dependencies]
 thiserror = "1.0"
 libc = "0.2"
+bitflags = "2.5"
 
 [[bin]]
-name = "main"
-path = "src/bin/main.rs"
+name = "file"
+path = "src/bin/file.rs"

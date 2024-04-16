@@ -5,26 +5,27 @@ use bindgen;
 use std::process::Command;
 
 fn main() {
-    let path_cur = std::env::current_dir().unwrap().display().to_string();
-    build_and_statically_link(&path_cur);
-
-    println!("cargo:rustc-flags=-l static=magic");
-    println!("cargo:rustc-link-search=native={}/build/lib", path_cur);
-    let builder = bindgen::Builder::default()
-        .header(format!("{}/build/include/magic.h", path_cur))
-        .clang_arg("-I./installed/include/")
-        .allowlist_var("MAGIC_.*")
-        .allowlist_function("magic_.*")
-        .layout_tests(false)
-        .generate()
+    println!("cargo:rerun-if-changed=build.rs");
+    let out_dir = std::env::var_os("OUT_DIR")
         .unwrap()
-        .write_to_file("src/magic/magic_sys.rs")
-        .unwrap();
+        .to_string_lossy()
+        .to_string();
+
+    #[cfg(target_os = "linux")]
+    build_and_statically_link_linux(&out_dir);
+
+    #[cfg(target_os = "windows")]
+    build_and_statically_link_windows();
+
+    #[cfg(target_os = "macos")]
+    build_and_statically_link_macos();
 }
 
-fn build_and_statically_link(build_path: &str) {
-    std::fs::remove_dir_all("build");
-    std::fs::create_dir("build");
+#[cfg(target_os = "linux")]
+fn build_and_statically_link_linux(out_dir: &str) {
+    let install_path = format!("{}/build", out_dir);
+    std::fs::remove_dir_all(&install_path);
+    std::fs::create_dir(&install_path);
     // autoreconf -f -i
     Command::new("/usr/bin/autoreconf")
         .current_dir("file/")
@@ -38,14 +39,13 @@ fn build_and_statically_link(build_path: &str) {
         .current_dir("file/")
         .arg("distclean")
         .status();
-    println!("cargo:warning=MESSAGE2");
-    // ./configure --disable-silent-rules --enable-static=true --enable-shared=false --prefix=$(pwd)/../build CC=x86_64-linux-musl-gcc
+    // ./configure --disable-silent-rules --enable-static=true --enable-shared=false --prefix=$(pwd)/build CC=x86_64-linux-musl-gcc
     let mut configure_args: Vec<String> = Vec::from([
         "./configure",
         "--disable-silent-rules",
         "--enable-static=true",
         "--enable-shared=false",
-        &format!("--prefix={}/build", &build_path),
+        &format!("--prefix={}", &install_path),
     ])
     .into_iter()
     .map(|i| i.to_string())
@@ -59,13 +59,11 @@ fn build_and_statically_link(build_path: &str) {
             configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"))
         }
     }
-
     Command::new("sh")
         .current_dir("file/")
         .args(configure_args)
         .status()
         .unwrap();
-    println!("cargo:warning=MESSAGE3");
 
     // make -j4
     Command::new("/usr/bin/make")
@@ -73,19 +71,39 @@ fn build_and_statically_link(build_path: &str) {
         .arg("-j4")
         .status()
         .unwrap();
-    println!("cargo:warning=MESSAGE4");
     // make -C tests check
     Command::new("/usr/bin/make")
         .current_dir("file/")
         .args(["-C", "tests", "check"])
         .status()
         .unwrap();
-    println!("cargo:warning=MESSAGE5");
     // make install
     Command::new("/usr/bin/make")
         .current_dir("file/")
         .arg("install")
         .status()
         .unwrap();
-    println!("cargo:warning=MESSAGE6");
+
+    println!("cargo:rustc-flags=-l static=magic");
+    println!("cargo:rustc-link-search=native={}/lib", &install_path);
+    bindgen::Builder::default()
+        .header(format!("{}/include/magic.h", &install_path))
+        .clang_arg(format!("-I{}/include/", &install_path))
+        .allowlist_var("MAGIC_.*")
+        .allowlist_function("magic_.*")
+        .layout_tests(false)
+        .generate()
+        .unwrap()
+        .write_to_file("src/magic/magic_sys.rs")
+        .unwrap();
+}
+
+#[cfg(target_os = "windows")]
+fn build_and_statically_link_windows() {
+    !unimplemented!("windows")
+}
+
+#[cfg(target_os = "macos")]
+fn build_and_statically_link_macos() {
+    !unimplemented!("macos")
 }
