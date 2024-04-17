@@ -2,7 +2,6 @@
 
 pub mod magic;
 
-#[doc(alias = "magic_version")]
 pub fn libmagic_version() -> libc::c_int {
     crate::magic::version()
 }

@@ -2,4 +2,5 @@
 /build
 /file
 /test
+/output
 Cargo.lock
