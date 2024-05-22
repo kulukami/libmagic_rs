@@ -1,13 +1,12 @@
 use libmagic_rs::{cookie, libmagic_version, Cookie};
+use log::*;
 use std::env;
 
 pub fn main() {
     println!("libmagic version: {}", libmagic_version());
-    let cookie = Cookie::open(
-        cookie::Flags::ERROR | cookie::Flags::DEBUG,
-        // | cookie::Flags::APPLE cookie::Flags::CONTINUE | cookie::Flags::MIME,
-    )
-    .unwrap();
+    let file_flags = cookie::Flags::ERROR;
+
+    let cookie = Cookie::open(file_flags).unwrap();
     let database = [
         "magic.mgc",
         //"/etc/magic.mgc",
@@ -18,8 +17,59 @@ pub fn main() {
     .unwrap();
     let cookie = cookie.load(&database).unwrap();
 
-    let target = "test.php";
-    println!("{}", cookie.file(target).unwrap());
+    let args: Vec<String> = std::env::args().collect();
+    let args_count = args.len();
 
-    println!("safe exit");
+    let mut fpath = "";
+
+    if args_count != 2 {
+        println!("Usage ./scanner_cli fname ");
+        return;
+    } else {
+        fpath = &args[1];
+    }
+
+    let fp = std::path::Path::new(fpath);
+    if !std::path::Path::new(fpath).exists() {
+        error!("path not exists");
+        return;
+    }
+
+    if fp.is_file() {
+        match cookie.file(fpath) {
+            Ok(result) => {
+                println!("{}: {}", &fpath, &result);
+            }
+            Err(e) => {
+                error!("{}: error :{}", fpath, e);
+            }
+        };
+    } else if fp.is_dir() {
+        let mut it = walkdir::WalkDir::new(fpath).into_iter();
+        loop {
+            let entry = match it.next() {
+                None => break,
+                Some(Err(err)) => {
+                    error!("ERROR: {} while scann {}", err, fpath);
+                    continue;
+                }
+                Some(Ok(entry)) => entry,
+            };
+            if entry.path().is_dir() {
+                continue;
+            }
+            let tfpath = entry.path().to_string_lossy().to_string();
+
+            match cookie.file(&tfpath) {
+                Ok(result) => {
+                    println!("{}: {}", &tfpath, &result);
+                }
+                Err(e) => {
+                    error!("{}: error :{}", fpath, e);
+                }
+            };
+        }
+    }
+
+    println!("[exit] Bye.");
 }

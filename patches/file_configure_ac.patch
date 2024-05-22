@@ -1,0 +1,10 @@
+--- file/configure.ac	2024-05-22 17:45:15.333028254 +0800
++++ ../../libmagic_rs/file/configure.ac	2024-05-22 17:22:39.756233827 +0800
+@@ -254,5 +254,5 @@
+   AC_DEFINE([LZLIBSUPPORT], 1, [Enable lzlib compression support])
+ fi
+ 
+-AC_CONFIG_FILES([Makefile src/Makefile magic/Makefile tests/Makefile doc/Makefile python/Makefile libmagic.pc])
++AC_CONFIG_FILES([Makefile src/Makefile libmagic.pc])
+
+ AC_OUTPUT

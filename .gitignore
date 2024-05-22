@@ -3,4 +3,11 @@
 /file
 /test
 /output
+/.cargo
 Cargo.lock
+
+*.a
+*.lib
+*.dll
+*.o
+*.log

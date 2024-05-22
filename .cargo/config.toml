@@ -12,3 +12,8 @@ linker = "x86_64-linux-musl-gcc"
 
 [target."aarch64-unknown-linux-musl"]
 linker = "aarch64-linux-musl-gcc"
+
+[target.x86_64-pc-windows-gnu]
+linker = "/usr/bin/x86_64-w64-mingw32-gcc"
+ar = "/usr/x86_64-w64-mingw32/bin/ar"
+rustflags = ["-Ctarget-feature=+crt-static"]

@@ -1,0 +1,11 @@
+--- file/Makefile.am	2024-05-22 17:45:07.963012959 +0800
++++ ../../libmagic_rs/file/Makefile.am	2024-05-22 17:22:39.756233827 +0800
+@@ -3,7 +3,7 @@
+ EXTRA_DIST = MAINT RELEASE-PROCEDURE README.DEVELOPER README.md \
+ 	m4/visibility.m4
+ 
+-SUBDIRS = src magic tests doc python
++SUBDIRS = src
+ 
+ # This variable must have 'exec' in its name, in order to be installed
+ # by 'install-exec' target (instead of default 'install-data')
