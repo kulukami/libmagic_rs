@@ -81,9 +81,10 @@ fn build_and_statically_link_linux(out_dir: &str) {
 
     if let Ok(target) = std::env::var("TARGET") {
         if target.starts_with("x86_64-unknown-linux-musl") {
-            configure_args.push(format!("CC={}", "x86_64-linux-musl-gcc"))
+            configure_args.push(format!("CC={}", "x86_64-linux-musl-gcc"));
         } else if target.starts_with("aarch64-unknown-linux-musl") {
-            configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"))
+            configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"));
+            configure_args.push(format!("--host=aarch64-pc-linux-gnu"));
         }
     }
     Command::new("sh")
