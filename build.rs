@@ -30,6 +30,26 @@ fn main() {
     }
 }
 
+fn revert_patches() {
+    Command::new("/usr/bin/patch")
+        .current_dir("./")
+        .arg("-R")
+        .arg("-u")
+        .arg("file/Makefile.am")
+        .arg("-i")
+        .arg("patches/file_Makefile_am.patch")
+        .status();
+
+    Command::new("/usr/bin/patch")
+        .current_dir("./")
+        .arg("-R")
+        .arg("-u")
+        .arg("file/configure.ac")
+        .arg("-i")
+        .arg("patches/file_configure_ac.patch")
+        .status();
+}
+
 fn apply_patches() {
     Command::new("/usr/bin/patch")
         .current_dir("./")
@@ -54,6 +74,8 @@ fn build_and_statically_link_linux(out_dir: &str) {
     let install_path = format!("{}/build", out_dir);
     std::fs::remove_dir_all(&install_path);
     std::fs::create_dir(&install_path);
+
+    revert_patches();
     // autoreconf -f -i
     Command::new("/usr/bin/autoreconf")
         .current_dir("file/")
