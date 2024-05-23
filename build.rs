@@ -79,14 +79,15 @@ fn build_and_statically_link_linux(out_dir: &str) {
     .map(|i| i.to_string())
     .collect();
 
-    if let Ok(target) = std::env::var("TARGET") {
-        if target.starts_with("x86_64-unknown-linux-musl") {
-            configure_args.push(format!("CC={}", "x86_64-linux-musl-gcc"));
-        } else if target.starts_with("aarch64-unknown-linux-musl") {
-            configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"));
-            configure_args.push(format!("--host=aarch64-pc-linux-gnu"));
-        }
+    let rustc_target = std::env::var("TARGET").unwrap();
+
+    if rustc_target.starts_with("x86_64-unknown-linux-musl") {
+        configure_args.push(format!("CC={}", "x86_64-linux-musl-gcc"));
+    } else if rustc_target.starts_with("aarch64-unknown-linux-musl") {
+        configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"));
+        configure_args.push(format!("--host=aarch64-pc-linux-gnu"));
     }
+
     Command::new("sh")
         .current_dir("file/")
         .args(configure_args)
@@ -109,9 +110,21 @@ fn build_and_statically_link_linux(out_dir: &str) {
 
     println!("cargo:rustc-flags=-l static=magic");
     println!("cargo:rustc-link-search=native={}/lib", &install_path);
-    bindgen::Builder::default()
+    let mut builder = bindgen::Builder::default()
         .header(format!("{}/include/magic.h", &install_path))
-        .clang_arg(format!("-I{}/include/", &install_path))
+        .clang_arg(format!("-I{}/include/", &install_path));
+
+    if rustc_target.starts_with("x86_64-unknown-linux-musl") {
+        builder = builder.clang_arg(format!(
+            "-I/opt/x86_64-linux-musl/x86_64-linux-musl/include"
+        ));
+    } else if rustc_target.starts_with("aarch64-unknown-linux-musl") {
+        builder = builder.clang_arg(format!(
+            "-I/opt/aarch64-linux-musl/aarch64-linux-musl/include"
+        ));
+    }
+
+    builder
         .allowlist_var("MAGIC_.*")
         .allowlist_function("magic_.*")
         .layout_tests(false)

@@ -9,9 +9,11 @@ registry = "https://rsproxy.cn/crates.io-index"
 
 [target."x86_64-unknown-linux-musl"]
 linker = "x86_64-linux-musl-gcc"
+ar = "x86_64-linux-musl-ar"
 
 [target."aarch64-unknown-linux-musl"]
 linker = "aarch64-linux-musl-gcc"
+ar = "aarch64-linux-musl-ar"
 
 [target.x86_64-pc-windows-gnu]
 linker = "/usr/bin/x86_64-w64-mingw32-gcc"
