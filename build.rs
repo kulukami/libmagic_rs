@@ -108,6 +108,9 @@ fn build_and_statically_link_linux(out_dir: &str) {
     } else if rustc_target.starts_with("aarch64-unknown-linux-musl") {
         configure_args.push(format!("CC={}", "aarch64-linux-musl-gcc"));
         configure_args.push(format!("--host=aarch64-pc-linux-gnu"));
+    } else if rustc_target.starts_with("x86_64-unknown-linux-gnu") {
+        configure_args.push(format!("CC={}", "x86_64-linux-gnu-gcc"));
+        configure_args.push(format!("--host=x86_64-pc-linux-gnu"));
     }
 
     Command::new("sh")
@@ -144,6 +147,10 @@ fn build_and_statically_link_linux(out_dir: &str) {
         builder = builder.clang_arg(format!(
             "-I/opt/aarch64-linux-musl/aarch64-linux-musl/include"
         ));
+    } else if rustc_target.starts_with("x86_64-unknown-linux-gnu") {
+        println!("cargo:rustc-flags=-l static=z");
+        println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu");
+        builder = builder.clang_arg(format!("-I/usr/include/x86_64-linux-gnu"));
     }
 
     builder
