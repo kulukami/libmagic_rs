@@ -95,6 +95,11 @@ fn build_and_statically_link_linux(out_dir: &str) {
         "--disable-silent-rules",
         "--enable-static=yes",
         "--enable-shared=no",
+        "--disable-zlib",
+        "--disable-bzlib",
+        "--disable-xzlib",
+        "--disable-zstdlib",
+        "--disable-lzlib",
         &format!("--prefix={}", &install_path),
     ])
     .into_iter()
@@ -148,8 +153,8 @@ fn build_and_statically_link_linux(out_dir: &str) {
             "-I/opt/aarch64-linux-musl/aarch64-linux-musl/include"
         ));
     } else if rustc_target.starts_with("x86_64-unknown-linux-gnu") {
-        println!("cargo:rustc-flags=-l static=z");
-        println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu");
+        //println!("cargo:rustc-flags=-l static=z");
+        //println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu");
         builder = builder.clang_arg(format!("-I/usr/include/x86_64-linux-gnu"));
     }
 
@@ -225,6 +230,11 @@ fn build_and_statically_link_windows(out_dir: &str) {
         "--disable-silent-rules",
         "--enable-static=yes",
         "--enable-shared=no",
+        "--disable-zlib",
+        "--disable-bzlib",
+        "--disable-xzlib",
+        "--disable-zstdlib",
+        "--disable-lzlib",
         "--host=x86_64-w64-mingw32",
         &format!("--prefix={}", &install_path),
     ])
