@@ -7,12 +7,12 @@ authors = ["kulukami@gmail.com"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-bindgen = { version = "0.69" }
+bindgen = { version = "0.71" }
 
 [dependencies]
-thiserror = "1.0"
+thiserror = "2.0"
 libc = "0.2"
-bitflags = "2.5"
+bitflags = "2.6"
 anyhow = "1.0"
 log = { version = "0.4", features = ["std"] }
 walkdir = "2.5"

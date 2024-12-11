@@ -1,6 +1,5 @@
 use libmagic_rs::{cookie, libmagic_version, Cookie};
 use log::*;
-use std::env;
 
 pub fn main() {
     println!("libmagic version: {}", libmagic_version());
