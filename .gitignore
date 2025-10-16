@@ -11,3 +11,8 @@ Cargo.lock
 *.dll
 *.o
 *.log
+
+file/
+libgnurx/Makefile
+libgnurx/config.status
+libgnurx/confdefs.h
