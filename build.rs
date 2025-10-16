@@ -249,7 +249,8 @@ fn build_and_statically_link_windows(out_dir: &str) {
     win_env.insert("CFLAGS".to_string(), format!("-I{}/include", install_path));
     win_env.insert(
         "LDFLAGS".to_string(),
-        format!("-L{}/lib -lshlwapi", install_path),
+        //format!("-L{}/lib -lshlwapi", install_path),
+        format!("-L{}/lib -L/usr/x86_64-w64-mingw32/lib -lshlwapi", install_path),
     );
 
     Command::new("sh")
@@ -275,12 +276,15 @@ fn build_and_statically_link_windows(out_dir: &str) {
         .status()
         .unwrap();
 
+    println!("cargo:rustc-link-search=native=/usr/x86_64-w64-mingw32/lib");
+    println!("cargo:rustc-flags=-l static=shlwapi");
     println!("cargo:rustc-flags=-l static=magic");
     println!("cargo:rustc-flags=-l static=regex");
     println!("cargo:rustc-link-search=native={}/lib", install_path);
     bindgen::Builder::default()
         .header(format!("{}/include/magic.h", &install_path))
         .clang_arg(format!("-I{}/include", &install_path))
+        .clang_arg(format!("-L/usr/x86_64-w64-mingw32/lib"))
         .clang_arg(format!("-L{}/lib", &install_path))
         .allowlist_var("MAGIC_.*")
         .allowlist_function("magic_.*")
