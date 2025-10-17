@@ -74,6 +74,9 @@ pub mod cookie {
         filenames: Option<CString>,
     }
 
+    #[cfg(target_os = "windows")]
+    const DATABASE_FILENAME_SEPARATOR: &str = ";";
+    #[cfg(not(target_os = "windows"))]
     const DATABASE_FILENAME_SEPARATOR: &str = ":";
 
     impl DatabasePaths {
