@@ -163,7 +163,7 @@ pub mod cookie {
     /// Most functions on a [`Cookie`] can return an error from `libmagic`,
     /// which unfortunately is not very structured.
     #[derive(thiserror::Error, Debug)]
-    #[error("magic cookie error in `libmagic` function {}", .function)]
+    #[error("magic cookie error in `libmagic` function {} {:?}", .function, .source.explanation)]
     pub struct Error {
         function: &'static str,
         //#[backtrace]

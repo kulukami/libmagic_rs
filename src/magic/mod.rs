@@ -45,7 +45,7 @@ match .errno {
 .explanation.to_string_lossy()
 )]
 pub(crate) struct CookieError {
-    explanation: std::ffi::CString,
+    pub explanation: std::ffi::CString,
     errno: Option<std::io::Error>,
 }
 
